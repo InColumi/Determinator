@@ -61,11 +61,6 @@ class List
 		_count = 0;
 	}
 
-	/*~List()
-	{
-		Clear();
-	}*/
-
 	int GetCount()
 	{
 		return _count;
@@ -206,32 +201,6 @@ class List
 		exit(0);
 	}
 	
-	void Unique()
-	{
-		Check();
-		List<char> uniqueEments;
-		Node* temp = _head;
-		bool isUnique = true;
-		for(int i = 1; i <= _count; i++)
-		{
-			for(int j = 1; j <= uniqueEments.GetCount(); j++)
-			{
-				if(temp->Value == uniqueEments.GetValueByPosition(j))
-				{
-					isUnique = false;
-					break;
-				}
-			}
-			if(isUnique)
-			{
-				uniqueEments.AddTail(temp->Value);
-			}
-			isUnique = true;
-			temp = temp->Next;
-		}
-		*this = uniqueEments;
-	}
-
 	void Sort()
 	{
 		T n = this->GetCount();
@@ -263,37 +232,6 @@ class List
 	bool IsEmpty()
 	{
 		return _head == NULL;
-	}
-
-	void AddHead(T value)
-	{
-		Node* node = new Node;
-
-		node->Prev = NULL;
-		node->Value = value;
-		node->Next = _head;
-
-		if(_head != NULL)
-			_head->Prev = node;
-
-		if(_count == 0)
-			_head = _tail = node;
-		else
-			_head = node;
-
-		_count++;
-	}
-
-	Node* GetTail()
-	{
-		Check();
-		return _tail;
-	}
-
-	Node* GetHead()
-	{
-		Check();
-		return _head;
 	}
 
 	void Del(int position)
@@ -337,10 +275,9 @@ class Determinator
 	private:
 	List<Pair> _pairs;
 	int _countPairs;
-	List<char> _names;
 	
 	public:
-	Determinator(): _pairs(), _countPairs(), _names() {}
+	Determinator(): _pairs(), _countPairs() {}
 
 	void ReadFromFile(string fileName)
 	{
@@ -356,19 +293,10 @@ class Determinator
 		getline(in, line);
 
 		_countPairs = stoi(line);
-		List<char> allNames;
 		while(getline(in, line))
 		{
-			char first = line[0];
-			char second = line[2];
-			//allNames.AddTail(first);
-			//allNames.AddTail(second);
-
-			_pairs.AddTail(Pair(first, second));
+			_pairs.AddTail(Pair(line[0], line[2]));
 		}
-
-		//allNames.Unique();
-		//SetNames(allNames);
 	}
 
 	void Check()
@@ -453,146 +381,7 @@ class Determinator
 	{
 		return (a > b) ? a : b;
 	}
-
-	bool IsControversial(List<List<Pair>> pairsByGroups)
-	{
-		return true;
-	}
-
-	bool IsFull(List<List<Pair>> pairsByGroups)
-	{
-		for(int i = 0; i < pairsByGroups.GetCount(); i++)
-		{
-
-		}
-		return true;
-	}
-
-	List<List<Pair>> GetGroupsByFirstValue()
-	{
-		List<List<Pair>> pairsByGroups;
-
-		for(int i = 1; i <= _names.GetCount(); i++)
-		{
-			List<Pair> tempPair;
-			for(int j = 1; j <= _countPairs; j++)
-			{
-				if(_pairs.GetValueByPosition(j).GetFirst() == _names.GetValueByPosition(i))
-				{
-					tempPair.AddTail(_pairs.GetValueByPosition(j));
-				}
-			}
-			if(tempPair.GetCount() != 0)
-			{
-				pairsByGroups.AddTail(tempPair);
-				tempPair.Clear();
-			}	
-		}
-		ShowByGroups(pairsByGroups);
-		return pairsByGroups;
-	}
-	
-	void ShowByGroups(List<List<Pair>> pairsByGroups)
-	{
-		for(int i = 1; i <= pairsByGroups.GetCount(); i++)
-		{
-			pairsByGroups.GetValueByPosition(i).ShowInfo();
-		}
-	}
-
-	void SetNames(List<char>& names)
-	{
-		for(int i = 1; i <= names.GetCount(); i++)
-		{
-			_names.AddTail(names.GetValueByPosition(i));
-		}
-	}
 };
-
-void Test()
-{
-	const int lch = 256;
-	int n = 3;
-
-	char** pairs = new char* [n];
-	for(int i = 0; i < n; i++)
-	{
-		pairs[i] = new char[2];
-	}
-
-	pairs[0][1] = '2';
-	pairs[0][2] = 'a';
-
-	pairs[1][1] = '8';
-	pairs[1][2] = 'c';
-
-	pairs[2][1] = 'c';
-	pairs[2][2] = 'b';
-
-	int chars[lch];
-
-	for(int i = 0; i < lch; i++)
-	{
-		chars[i] = -1;
-	}
-
-	int K = 0;
-	for(int i = 0; i < n; i++)
-	{
-		cout << pairs[i][1] << ' ' << pairs[i][2] << endl;
-		if(chars[pairs[i][1]] == -1)
-			K++;
-		if(chars[pairs[i][2]] == -1)
-			K++;
-		chars[pairs[i][1]] = 0;
-		chars[pairs[i][2]] = 0;
-	}
-
-	bool change;
-	char x, y;
-	int M;
-	for(int i = 0; i < n; i++)
-	{
-		change = false;
-		for(int j = 0; j < n; j++)
-		{
-			x = pairs[j][1];
-			y = pairs[j][2];
-			M = max(chars[x] + 1, chars[y]);
-			if(M > (K - 1))
-			{
-				cout << "Порядок противоречив";
-				return;
-			}
-			if(chars[y] != M)
-			{
-				change = true;
-			}
-			chars[y] = M;
-		}
-		if(!change)
-		{
-			sort(chars, chars + lch);
-			int previous = K;
-			int k = lch - 1;
-			while(chars[k] > -1)
-			{
-				if(chars[k] == previous - 1)
-				{
-					previous--;
-				}
-				else
-				{
-					cout << "порядок неполный";
-					return;
-				}
-				k--;
-			}
-			cout << "полный порядок";
-			return;
-		}
-	}
-}
 
 int main()
 {
@@ -600,6 +389,5 @@ int main()
 	Determinator determinator;
 	determinator.ReadFromFile("input.txt");
 	determinator.Check();
-	//Test();
 	return 0;
 }
