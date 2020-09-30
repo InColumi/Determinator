@@ -70,26 +70,6 @@ class List
 		return _count;
 	}
 
-	Node* GetTail()
-	{
-		if(_tail != NULL)
-		{
-			return _tail;
-		}
-		cout << "Хвост пуст\n";
-		exit(0);
-	}
-
-	Node* GetHead()
-	{
-		if(_head != NULL)
-		{
-			return _tail;
-		}
-		cout << "Голова пуста\n";
-		exit(0);
-	}
-
 	void DelAll()
 	{
 		while(_count != 0)
@@ -114,23 +94,22 @@ class List
 		_count++;
 	}
 
-	void AddHead(T value)
+	List<T>& operator = (const List<T>& list)
 	{
-		Node* node = new Node;
+		if(this == &list)
+			return *this;
 
-		node->Prev = NULL;
-		node->Value = value;
-		node->Next = _head;
+		this->~List();
 
-		if(_head != NULL)
-			_head->Prev = node;
+		Node* temp = list._head;
 
-		if(_count == 0)
-			_head = _tail = node;
-		else
-			_head = node;
+		while(temp != NULL)
+		{
+			AddTail(temp->Value);
+			temp = temp->Next;
+		}
 
-		_count++;
+		return *this;
 	}
 
 	void ShowInfo()
@@ -211,11 +190,83 @@ class List
 		cout << "На позиции NULL\n";
 		exit(0);
 	}
+	
+	void Unique()
+	{
+		Check();
+		List<char> uniqueEments;
+		Node* temp = _head;
+		bool isUnique = true;
+		for(int i = 1; i <= _count; i++)
+		{
+			for(int j = 1; j <= uniqueEments.GetCount(); j++)
+			{
+				if(temp->Value == uniqueEments.GetValueByPosition(j))
+				{
+					isUnique = false;
+					break;
+				}
+			}
+			if(isUnique)
+			{
+				uniqueEments.AddTail(temp->Value);
+			}
+			isUnique = true;
+			temp = temp->Next;
+		}
+		*this = uniqueEments;
+	}
 
 	private:
 
+	void Check()
+	{
+		if(IsEmpty())
+		{
+			cout << "Список пуст" << '\n';
+			exit(0);
+		}
+	}
+
+	bool IsEmpty()
+	{
+		return _head == NULL;
+	}
+
+	void AddHead(T value)
+	{
+		Node* node = new Node;
+
+		node->Prev = NULL;
+		node->Value = value;
+		node->Next = _head;
+
+		if(_head != NULL)
+			_head->Prev = node;
+
+		if(_count == 0)
+			_head = _tail = node;
+		else
+			_head = node;
+
+		_count++;
+	}
+
+	Node* GetTail()
+	{
+		Check();
+		return _tail;
+	}
+
+	Node* GetHead()
+	{
+		Check();
+		return _head;
+	}
+
 	void Del(int position)
 	{
+		Check();
 		if(position < 1 || position > _count)
 		{
 			cout << "Неверная позиция\n";
@@ -293,13 +344,8 @@ class Determinator
 int main()
 {
 	setlocale(LC_ALL, "rus");
-	List<char> a;
+	Determinator determinator;
+	determinator.ReadFromFile("input.txt");
 
-	a.AddTail('1');
-	a.AddTail('2');
-	a.AddTail('3');
-	a.AddTail('4');
-	a.AddTail('5');
-	
 	return 0;
 }
