@@ -60,10 +60,10 @@ class List
 		_count = 0;
 	}
 
-	~List()
+	/*~List()
 	{
 		Clear();
-	}
+	}*/
 
 	int GetCount()
 	{
@@ -99,7 +99,7 @@ class List
 		if(this == &list)
 			return *this;
 
-		this->~List();
+		this->Clear();
 
 		Node* temp = list._head;
 
@@ -266,7 +266,6 @@ class List
 
 	void Del(int position)
 	{
-		Check();
 		if(position < 1 || position > _count)
 		{
 			cout << "Неверная позиция\n";
@@ -297,7 +296,7 @@ class List
 
 		delete Del;
 
-		_count--;
+		--_count;
 	}
 };
 
@@ -339,15 +338,43 @@ class Determinator
 		SetNames(allNames);
 	}
 
+	void MakeGroupsByFirstValue()
+	{
+		List<List<Pair>> pairsByGroups;
+
+		for(int i = 1; i <= _names.GetCount(); i++)
+		{
+			List<Pair> tempPair;
+			for(int j = 1; j <= _countPairs; j++)
+			{
+				if(_pairs.GetValueByPosition(j).GetFirst() == _names.GetValueByPosition(i))
+				{
+					tempPair.AddTail(_pairs.GetValueByPosition(j));
+				}
+			}
+			if(tempPair.GetCount() != 0)
+			{
+				pairsByGroups.AddTail(tempPair);
+				tempPair.Clear();
+			}	
+		}
+		
+		for(int i = 1; i <= pairsByGroups.GetCount(); i++)
+		{
+			pairsByGroups.GetValueByPosition(i).ShowInfo();
+		}
+	}
+
 	private:
+
+	
+
 	void SetNames(List<char>& names)
 	{
 		for(int i = 1; i <= names.GetCount(); i++)
 		{
 			_names.AddTail(names.GetValueByPosition(i));
 		}
-
-		_names.ShowInfo();
 	}
 };
 
@@ -356,6 +383,6 @@ int main()
 	setlocale(LC_ALL, "rus");
 	Determinator determinator;
 	determinator.ReadFromFile("input.txt");
-
+	determinator.MakeGroupsByFirstValue();
 	return 0;
 }
