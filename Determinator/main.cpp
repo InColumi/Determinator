@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <algorithm>
 
 using namespace std;
 
@@ -128,6 +129,19 @@ class List
 		}
 	}
 
+	void ChangeValueByPosition(int position, T value)
+	{
+		Check();
+		int i = 1;
+		Node* valueOnPosition = _head;
+		while(i < position)
+		{
+			valueOnPosition = valueOnPosition->Next;
+			i++;
+		}
+		valueOnPosition->Value = value;
+	}
+
 	void Insert(int position, T value)
 	{
 		if(position < 1 || position > _count + 1)
@@ -148,6 +162,7 @@ class List
 
 		int i = 1;
 		Node* ValueOnPosition = _head;
+
 		while(i < position)
 		{
 			ValueOnPosition = ValueOnPosition->Next;
@@ -215,6 +230,23 @@ class List
 			temp = temp->Next;
 		}
 		*this = uniqueEments;
+	}
+
+	void Sort()
+	{
+		T n = this->GetCount();
+		for(int i = 1; i <= n - 1; i++)
+		{
+			for(int j = 1; j <= n - i; j++)
+			{
+				if(this->GetValueByPosition(j) > this->GetValueByPosition(j + 1))
+				{
+					int temp = this->GetValueByPosition(j);
+					this->ChangeValueByPosition(j, this->GetValueByPosition(j + 1));
+					this->ChangeValueByPosition(j + 1, temp);
+				}
+			}
+		}
 	}
 
 	private:
@@ -329,16 +361,114 @@ class Determinator
 		{
 			char first = line[0];
 			char second = line[2];
-			allNames.AddTail(first);
-			allNames.AddTail(second);
+			//allNames.AddTail(first);
+			//allNames.AddTail(second);
 
 			_pairs.AddTail(Pair(first, second));
 		}
-		allNames.Unique();
-		SetNames(allNames);
+
+		//allNames.Unique();
+		//SetNames(allNames);
 	}
 
-	void MakeGroupsByFirstValue()
+	void Check()
+	{
+		int countSymbols = 256;
+		List<int> intSymbols;
+		for(int i = 0; i < countSymbols; i++)
+		{
+			intSymbols.AddTail(-1);
+		}
+
+		int countInputSymbols = 0;
+		for(int i = 1; i <= _countPairs; i++)
+		{
+			int first = intSymbols.GetValueByPosition(_pairs.GetValueByPosition(i).GetFirst());
+			int second = intSymbols.GetValueByPosition(_pairs.GetValueByPosition(i).GetSecond());
+			cout << _pairs.GetValueByPosition(i).GetFirst() << ' ' << _pairs.GetValueByPosition(i).GetSecond() << endl;
+
+			if(first == -1)
+			{
+				++countInputSymbols;
+			}
+			if(second == -1)
+			{
+				++countInputSymbols;
+			}
+			intSymbols.ChangeValueByPosition(_pairs.GetValueByPosition(i).GetFirst(), 0);
+			intSymbols.ChangeValueByPosition(_pairs.GetValueByPosition(i).GetSecond(), 0);
+		}
+
+		bool isChange = false;
+		char tempFirst;
+		char tempSecond;
+		int max;
+		for(int i = 1; i <= _countPairs; i++)
+		{
+			isChange = false;
+			for(int j = 1; j <= _countPairs; j++)
+			{
+				tempFirst = _pairs.GetValueByPosition(j).GetFirst();
+				tempSecond = _pairs.GetValueByPosition(j).GetSecond();
+
+				max = GetMax(intSymbols.GetValueByPosition(tempFirst) + 1, intSymbols.GetValueByPosition(tempSecond));
+				if(max > (countInputSymbols - 1))
+				{
+					cout << "Порядок противоречив";
+					return;
+				}
+				if(intSymbols.GetValueByPosition(tempSecond) != max)
+				{
+					isChange = true;
+				}
+				intSymbols.ChangeValueByPosition(tempSecond, max);
+			}
+			if(!isChange)
+			{
+				intSymbols.Sort();
+				int prev = countInputSymbols;
+				int indexForSymbols = countSymbols;
+				while(intSymbols.GetValueByPosition(indexForSymbols) > - 1)
+				{
+					if(intSymbols.GetValueByPosition(indexForSymbols) == prev - 1)
+					{
+						prev--;
+					}
+					else
+					{
+						cout << "порядок неполный";
+						return;
+					}
+					indexForSymbols--;
+				}
+				cout << "полный порядок";
+				return;
+			}
+		}
+	}
+
+	private:
+
+	int GetMax(int a, int b)
+	{
+		return (a > b) ? a : b;
+	}
+
+	bool IsControversial(List<List<Pair>> pairsByGroups)
+	{
+		return true;
+	}
+
+	bool IsFull(List<List<Pair>> pairsByGroups)
+	{
+		for(int i = 0; i < pairsByGroups.GetCount(); i++)
+		{
+
+		}
+		return true;
+	}
+
+	List<List<Pair>> GetGroupsByFirstValue()
 	{
 		List<List<Pair>> pairsByGroups;
 
@@ -358,16 +488,17 @@ class Determinator
 				tempPair.Clear();
 			}	
 		}
-		
+		ShowByGroups(pairsByGroups);
+		return pairsByGroups;
+	}
+	
+	void ShowByGroups(List<List<Pair>> pairsByGroups)
+	{
 		for(int i = 1; i <= pairsByGroups.GetCount(); i++)
 		{
 			pairsByGroups.GetValueByPosition(i).ShowInfo();
 		}
 	}
-
-	private:
-
-	
 
 	void SetNames(List<char>& names)
 	{
@@ -378,11 +509,97 @@ class Determinator
 	}
 };
 
+void Test()
+{
+	const int lch = 256;
+	int n = 3;
+
+	char** pairs = new char* [n];
+	for(int i = 0; i < n; i++)
+	{
+		pairs[i] = new char[2];
+	}
+
+	pairs[0][1] = '2';
+	pairs[0][2] = 'a';
+
+	pairs[1][1] = '8';
+	pairs[1][2] = 'c';
+
+	pairs[2][1] = 'c';
+	pairs[2][2] = 'b';
+
+	int chars[lch];
+
+	for(int i = 0; i < lch; i++)
+	{
+		chars[i] = -1;
+	}
+
+	int K = 0;
+	for(int i = 0; i < n; i++)
+	{
+		cout << pairs[i][1] << ' ' << pairs[i][2] << endl;
+		if(chars[pairs[i][1]] == -1)
+			K++;
+		if(chars[pairs[i][2]] == -1)
+			K++;
+		chars[pairs[i][1]] = 0;
+		chars[pairs[i][2]] = 0;
+	}
+
+	bool change;
+	char x, y;
+	int M;
+	for(int i = 0; i < n; i++)
+	{
+		change = false;
+		for(int j = 0; j < n; j++)
+		{
+			x = pairs[j][1];
+			y = pairs[j][2];
+			M = max(chars[x] + 1, chars[y]);
+			if(M > (K - 1))
+			{
+				cout << "Порядок противоречив";
+				return;
+			}
+			if(chars[y] != M)
+			{
+				change = true;
+			}
+			chars[y] = M;
+		}
+		if(!change)
+		{
+			sort(chars, chars + lch);
+			int previous = K;
+			int k = lch - 1;
+			while(chars[k] > -1)
+			{
+				if(chars[k] == previous - 1)
+				{
+					previous--;
+				}
+				else
+				{
+					cout << "порядок неполный";
+					return;
+				}
+				k--;
+			}
+			cout << "полный порядок";
+			return;
+		}
+	}
+}
+
 int main()
 {
 	setlocale(LC_ALL, "rus");
 	Determinator determinator;
 	determinator.ReadFromFile("input.txt");
-	determinator.MakeGroupsByFirstValue();
+	determinator.Check();
+	//Test();
 	return 0;
 }
