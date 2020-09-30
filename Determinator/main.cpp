@@ -62,7 +62,7 @@ class List
 
 	~List()
 	{
-		DelAll();
+		Clear();
 	}
 
 	int GetCount()
@@ -70,7 +70,7 @@ class List
 		return _count;
 	}
 
-	void DelAll()
+	void Clear()
 	{
 		while(_count != 0)
 			Del(1);
@@ -285,9 +285,9 @@ class List
 		Node* prevDel = Del->Prev;
 		Node* afterDel = Del->Next;
 
-		if(prevDel != 0 && _count != 1)
+		if(prevDel != NULL && _count != 1)
 			prevDel->Next = afterDel;
-		if(afterDel != 0 && _count != 1)
+		if(afterDel != NULL && _count != 1)
 			afterDel->Prev = prevDel;
 
 		if(position == 1)
@@ -325,19 +325,29 @@ class Determinator
 		getline(in, line);
 
 		_countPairs = stoi(line);
+		List<char> allNames;
 		while(getline(in, line))
 		{
-			_pairs.AddTail(Pair(line[0], line[2]));
+			char first = line[0];
+			char second = line[2];
+			allNames.AddTail(first);
+			allNames.AddTail(second);
+
+			_pairs.AddTail(Pair(first, second));
 		}
+		allNames.Unique();
+		SetNames(allNames);
 	}
 
 	private:
-	void SetNames()
+	void SetNames(List<char>& names)
 	{
-		for(int i = 0; i < _countPairs; i++)
+		for(int i = 1; i <= names.GetCount(); i++)
 		{
-
+			_names.AddTail(names.GetValueByPosition(i));
 		}
+
+		_names.ShowInfo();
 	}
 };
 
