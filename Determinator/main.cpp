@@ -72,12 +72,22 @@ class List
 
 	Node* GetTail()
 	{
-		return _tail;
+		if(_tail != NULL)
+		{
+			return _tail;
+		}
+		cout << "Хвост пуст\n";
+		exit(0);
 	}
 
 	Node* GetHead()
 	{
-		return _head;
+		if(_head != NULL)
+		{
+			return _tail;
+		}
+		cout << "Голова пуста\n";
+		exit(0);
 	}
 
 	void DelAll()
@@ -179,9 +189,30 @@ class List
 		_count++;
 	}
 
-	private:
+	T GetValueByPosition(int position)
+	{
+		if(position < 1 || position > _count)
+		{
+			cout << "Нет такой позиции\n";
+			exit(0);
+		}
 
-	
+		Node* temp = _head;
+		int i = 1;
+		while(i < position && temp)
+		{
+			temp = temp->Next;
+			i++;
+		}
+		if(temp)
+		{
+			return temp->Value;
+		}
+		cout << "На позиции NULL\n";
+		exit(0);
+	}
+
+	private:
 
 	void Del(int position)
 	{
@@ -269,6 +300,6 @@ int main()
 	a.AddTail('3');
 	a.AddTail('4');
 	a.AddTail('5');
-	a.ShowInfo();
+	
 	return 0;
 }
