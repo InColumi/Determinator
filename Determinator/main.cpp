@@ -1,8 +1,6 @@
 #include <iostream>
 #include <fstream>
 #include <string>
-#include <algorithm>
-#include <list>
 
 using namespace std;
 
@@ -51,21 +49,21 @@ class List
 		Node* Next;
 	};
 
-    Node* _head, * _tail;
-    int _count;
+	Node* _head, * _tail;
+	int _count;
 
-    public:
+	public:
 
-    List()
-    {
-        _head = _tail = NULL;
-        _count = 0;
-    }
+	List()
+	{
+		_head = _tail = NULL;
+		_count = 0;
+	}
 
-    ~List()
-    {
-        DelAll();
-    }
+	~List()
+	{
+		DelAll();
+	}
 
 	int GetCount()
 	{
@@ -141,7 +139,49 @@ class List
 		}
 	}
 
+	void Insert(int position, T value)
+	{
+		if(position < 1 || position > _count + 1)
+		{
+			cout << "Нет такой позиции\n";
+			exit(0);
+		}
+		else if(position == _count + 1)
+		{
+			AddTail(value);
+			return;
+		}
+		else if(position == 1)
+		{
+			AddHead(value);
+			return;
+		}
+
+		int i = 1;
+		Node* ValueOnPosition = _head;
+		while(i < position)
+		{
+			ValueOnPosition = ValueOnPosition->Next;
+			i++;
+		}
+
+		Node* prev = ValueOnPosition->Prev;
+		Node* temp = new Node;
+		temp->Value = value;
+
+		if(prev != NULL && _count != 1)
+			prev->Next = temp;
+
+		temp->Next = ValueOnPosition;
+		temp->Prev = prev;
+		ValueOnPosition->Prev = temp;
+
+		_count++;
+	}
+
 	private:
+
+	
 
 	void Del(int position)
 	{
@@ -179,56 +219,49 @@ class List
 	}
 };
 
-//class Determinator
-//{
-//	private:
-//	list<Pair> _pairs;
-//	int _countPairs;
-//	list<char> _names;
-//	
-//	public:
-//	Determinator(): _pairs(), _countPairs(), _names() {}
-//
-//	void ReadFromFile(string fileName)
-//	{
-//		ifstream in;
-//		in.open(fileName);
-//		if(in.is_open() == false)
-//		{
-//			cout << "Файл не найден!\n";
-//			exit(0);
-//		}
-//
-//		string line;
-//		getline(in, line);
-//
-//		_countPairs = stoi(line);
-//		while(getline(in, line))
-//		{
-//			_pairs.push_back(Pair(line[0], line[2]));
-//		}
-//	}
-//
-//	private:
-//	void SetNames()
-//	{
-//		for(int i = 0; i < _countPairs; i++)
-//		{
-//
-//		}
-//	}
-//};
+class Determinator
+{
+	private:
+	List<Pair> _pairs;
+	int _countPairs;
+	List<char> _names;
+	
+	public:
+	Determinator(): _pairs(), _countPairs(), _names() {}
+
+	void ReadFromFile(string fileName)
+	{
+		ifstream in;
+		in.open(fileName);
+		if(in.is_open() == false)
+		{
+			cout << "Файл не найден!\n";
+			exit(0);
+		}
+
+		string line;
+		getline(in, line);
+
+		_countPairs = stoi(line);
+		while(getline(in, line))
+		{
+			_pairs.AddTail(Pair(line[0], line[2]));
+		}
+	}
+
+	private:
+	void SetNames()
+	{
+		for(int i = 0; i < _countPairs; i++)
+		{
+
+		}
+	}
+};
 
 int main()
 {
 	setlocale(LC_ALL, "rus");
-	List<Pair> s;
-	
-	s.AddTail(Pair('1', '2'));
-	s.AddTail(Pair('3', '4'));
-	s.AddTail(Pair('5', '6'));
-	s.ShowInfo();
-
 	List<char> a;
 
 	a.AddTail('1');
@@ -237,6 +270,5 @@ int main()
 	a.AddTail('4');
 	a.AddTail('5');
 	a.ShowInfo();
-
 	return 0;
 }
